@@ -164,7 +164,7 @@ def handle_special_payees(df):
 # Entry point / Example usage:
 if __name__ == "__main__":
     cc_txn_source_path = read_env_var('cc_txn_source_path')
-    csv_file = '20 Statement Download*.csv'
+    csv_file = '31 Statement Download*.csv'
     a = convert_nw_transactions(cc_txn_source_path, csv_file)
     a.head()
    
