@@ -2,7 +2,12 @@
 import unittest
 import pandas as pd
 from pprint import pprint
-from nw_to_homebank_csv import set_placeholder_values, mark_statement_boundary, handle_special_payees
+from nw_to_homebank_csv import (
+    set_placeholder_values,
+    mark_statement_boundary,
+    handle_special_payees,
+    format_paid_columns,
+)
 
 class TestPreprocessData(unittest.TestCase):
     def setUp(self):
@@ -127,6 +132,31 @@ class TestPreprocessData(unittest.TestCase):
             actual_output = handle_special_payees(self.amazon_capped_data)
             pprint(actual_output)
             pd.testing.assert_frame_equal(expected_output, actual_output)
+
+    def test_format_paid_columns_handles_string_amounts_and_blanks(self):
+        input_df = pd.DataFrame({
+            "Paid out": pd.Series(["100.00", ""], dtype="string"),
+            "Paid in": pd.Series([pd.NA, "10.00"], dtype="string"),
+        })
+
+        actual_output = format_paid_columns(input_df)
+
+        pd.testing.assert_series_equal(
+            actual_output["Paid"],
+            pd.Series([-100.0, 10.0], name="Paid"),
+        )
+
+    def test_preprocess_data_handles_misdecoded_currency_symbol(self):
+        input_df = self.input_df.copy()
+        input_df["Paid out"] = ["�100.00", "", "�254.23"]
+        input_df["Paid in"] = ["", "�10.00", ""]
+
+        actual_output = format_paid_columns(set_placeholder_values(input_df))
+
+        pd.testing.assert_series_equal(
+            actual_output["Paid"],
+            pd.Series([-100.0, 10.0, -254.23], name="Paid"),
+        )
 
         
 if __name__ == "__main__":

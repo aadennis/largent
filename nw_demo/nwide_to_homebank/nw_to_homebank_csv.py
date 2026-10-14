@@ -39,8 +39,8 @@ def convert_nw_to_homebank_csv(in_file, out_file):
         "info": "info 1",  # placeholder
         "Transactions": input_df["Transactions"].str.capitalize(),
         "Location": input_df["Location"],
-        "Paid out": input_df["Paid out"].astype(str).str.replace("£", ""),
-        "Paid in": input_df["Paid in"].astype(str).str.replace("£", ""),
+        "Paid out": input_df["Paid out"].astype(str).str.replace(r"[^\d.-]", "", regex=True),
+        "Paid in": input_df["Paid in"].astype(str).str.replace(r"[^\d.-]", "", regex=True),
         "category": "category 1",  # placeholder
         "Tags": "tag1 tag2"  # placeholder
     })
@@ -61,9 +61,8 @@ def convert_nw_to_homebank_csv(in_file, out_file):
 # Write the not-null value to a Paid column, and drop the original columns.
 
 def format_paid_columns(df):
-    df.fillna(0, inplace=True)
-    df["Paid out"] = df["Paid out"].astype(float)
-    df["Paid in"] = df["Paid in"].astype(float)
+    df["Paid out"] = pd.to_numeric(df["Paid out"], errors="coerce").fillna(0.0)
+    df["Paid in"] = pd.to_numeric(df["Paid in"], errors="coerce").fillna(0.0)
     df["Paid"] = df.apply(lambda row: (row["Paid out"] * -1)
                            if row["Paid out"] > 0.0 else row["Paid in"], axis=1)
     # original Paid columns can now be dropped
@@ -92,8 +91,8 @@ def set_placeholder_values(input_df):
         "info": "info 1",  # placeholder
         "Transactions": input_df["Transactions"].str.capitalize(),
         "Location": input_df["Location"],
-        "Paid out": input_df["Paid out"].astype(str).str.replace("£", ""),
-        "Paid in": input_df["Paid in"].astype(str).str.replace("£", ""),
+        "Paid out": input_df["Paid out"].astype(str).str.replace(r"[^\d.-]", "", regex=True),
+        "Paid in": input_df["Paid in"].astype(str).str.replace(r"[^\d.-]", "", regex=True),
         "category": "category 1",  # placeholder
         "Tags": "tag1 tag2"  # placeholder
     })
@@ -164,7 +163,7 @@ def handle_special_payees(df):
 # Entry point / Example usage:
 if __name__ == "__main__":
     cc_txn_source_path = read_env_var('cc_txn_source_path')
-    csv_file = '31 Statement Download*.csv'
+    csv_file = '40 Statement Download*.csv'
     a = convert_nw_transactions(cc_txn_source_path, csv_file)
     a.head()
    
