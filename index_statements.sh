@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-
 # This script renames the PDF files in the current directory 
 # by prepending the month number to the filename.
-
 
 declare -A mon=(
     [Jan]=01 [Feb]=02 [Mar]=03 [Apr]=04
@@ -17,7 +15,13 @@ cd "$dir" || exit 1
 
 for f in *.pdf
 do
+    # Skip files already starting with 01-12 
+    [[ $f =~ ^(0[1-9]|1[0-2])\ .* ]] && continue
+
     month=${f%% *}
+
+    # Skip if first word isn't a recognised month 
+    [[ -z ${mon[$month]} ]] && continue
     # remove the 'echo' command to actually rename the files
     echo mv "$f" "${mon[$month]} $f"
 done
