@@ -18,6 +18,6 @@ cd $dir || exit 1
 for f in *.pdf
 do
     month=${f%% *}
+    # remove the 'echo' command to actually rename the files
     echo mv "$f" "${mon[$month]} $f"
 done
-
