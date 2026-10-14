@@ -11,6 +11,8 @@ declare -A mon=(
 )
 
 # cd into the directory containing the PDF files
+dir="x"
+cd $dir || exit 1
 
 for f in *.pdf
 do
