@@ -11,6 +11,7 @@ declare -A mon=(
 )
 
 # cd into the directory containing the PDF files
+# use wslpath to turn the DOS path into a WSL path
 dir="x"
 cd $dir || exit 1
 
